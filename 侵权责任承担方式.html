@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>侵权责任PPT互动游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            overflow: auto;
+            font-size: 20px;
+            padding: 10px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            overflow-y: auto;
+            max-width: 1200px;
+            width: 100%;
+            max-height: 95vh;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .content {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: auto;
+        }
+
+        .question-screen {
+            text-align: center;
+            width: 100%;
+        }
+
+        .case-description {
+            background: #fff8f0;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 15px 0 25px 0; /* 增加底部间距 */
+            border-left: 6px solid #ff9500;
+            font-size: 24px;
+            line-height: 1.7;
+            text-align: left;
+            box-shadow: 0 4px 12px rgba(255, 149, 0, 0.1);
+            word-wrap: break-word;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .option {
+            background: #f5f5f5;
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            font-size: 22px;
+            font-weight: bold;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            word-wrap: break-word;
+        }
+
+        .option:hover {
+            border-color: #4facfe;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            animation: pulse 0.6s ease;
+        }
+
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            animation: shake 0.6s ease;
+        }
+
+        .option-description {
+            font-size: 18px;
+            color: #666;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+
+        .explanation {
+            background: #e8f5e8;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 6px solid #28a745;
+            display: none;
+            text-align: left;
+            width: 100%;
+            max-width: 1100px;
+            word-wrap: break-word;
+        }
+
+        .explanation h4 {
+            color: #28a745;
+            margin-bottom: 12px;
+            font-size: 22px;
+        }
+
+        .explanation p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            font-size: 20px;
+        }
+
+        /* 简化翻页按钮样式 */
+        .page-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+            margin-bottom: 20px;
+        }
+
+        .page-btn {
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .page-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 当前页码指示器（简化版） */
+        .page-indicator {
+            color: #4facfe;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0 10px;
+            line-height: 45px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        .welcome-screen {
+            text-align: center;
+            animation: fadeIn 1s ease;
+            padding: 20px 0;
+        }
+
+        .start-btn {
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 24px;
+            border-radius: 35px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+            box-shadow: 0 6px 18px rgba(79, 172, 254, 0.4);
+            font-weight: bold;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.6);
+        }
+
+        /* 法律条文样式 */
+        .law-content {
+            background: #f0f9ff;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 6px solid #4facfe;
+            text-align: left;
+            font-size: 22px;
+            line-height: 1.7;
+            max-width: 1100px;
+            width: 100%;
+            word-wrap: break-word;
+        }
+
+        .law-content h3 {
+            color: #4facfe;
+            margin-bottom: 20px;
+            font-size: 26px;
+            text-align: center;
+        }
+
+        .law-row {
+            margin-bottom: 15px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 12px;
+            font-size: 22px;
+            font-weight: bold;
+            line-height: 1.6;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            word-wrap: break-word;
+        }
+
+        .law-row:nth-child(2) {
+            background: #f0fff4;
+            border-left: 5px solid #28a745;
+        }
+
+        .law-row:nth-child(3) {
+            background: #fff0f5;
+            border-left: 5px solid #e83e8c;
+        }
+
+        .law-row:nth-child(4) {
+            background: #f0f5ff;
+            border-left: 5px solid #4facfe;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 1000px) {
+            .options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 700px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+            
+            .case-description {
+                font-size: 22px;
+                padding: 20px;
+            }
+            
+            .option {
+                font-size: 20px;
+                padding: 18px 12px;
+            }
+            
+            .header h1 {
+                font-size: 26px;
+            }
+            
+            .page-controls {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="gameContainer">
+        <div class="header">
+            <h1>🏥 侵权责任承担方式 - PPT互动游戏</h1>
+        </div>
+
+        <div class="content">
+            <!-- 欢迎界面 -->
+            <div class="welcome-screen" id="welcomeScreen">
+                <!-- 法律条文内容 -->
+                <div class="law-content">
+                    <h3>📚 根据《民法典》第179条，侵权责任承担方式有9种：</h3>
+                    
+                    <div class="law-row">第一类，行为制止类：①停止侵害 ②排除妨碍 ③消除危险</div>
+                    <div class="law-row">第二类，财产救济类：④返还财产 ⑤恢复原状 ⑥赔偿损失</div>
+                    <div class="law-row">第三类，精神抚慰类：⑦赔礼道歉 ⑧消除影响 ⑨恢复名誉</div>
+                </div>
+                
+                <button class="start-btn" onclick="startGame()">🚀 开始游戏</button>
+            </div>
+
+            <!-- 题目界面 -->
+            <div class="question-screen" id="questionScreen" style="display: none;">
+                <div class="case-description" id="caseDescription"></div>
+                
+                <div class="options" id="options"></div>
+                
+                <div class="explanation" id="explanation"></div>
+                
+                <!-- 简化翻页控制 -->
+                <div class="page-controls">
+                    <button class="page-btn" id="prevBtn" onclick="prevQuestion()" disabled>⬅️ 上一题</button>
+                    <span class="page-indicator" id="pageIndicator"></span>
+                    <button class="page-btn" id="nextBtn" onclick="nextQuestion()">下一题 ➡️</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        let gameEnded = false;
+        let selectedMultipleChoices = [];
+        let speechInstance = null;
+
+        const questions = [
+            {
+                case: "（单选）小张在图书馆大声喧哗，影响其他同学学习。图书馆管理员要求他停止这种行为。",
+                correctAnswer: "停止侵害",
+                options: [
+                    { text: "停止侵害", description: "立即制止正在进行的侵权行为" },
+                    { text: "排除妨碍", description: "清除阻碍权利行使的障碍" },
+                    { text: "消除危险", description: "消除可能造成损害的危险状态" }
+                ],
+                explanation: {
+                    title: "✅ 答案解析：停止侵害",
+                    content: [
+                        "小张正在图书馆大声喧哗，这是正在进行的侵权行为。",
+                        "停止侵害用于制止正在发生的侵权行为，避免损害扩大。",
+                        "记忆技巧：正在进行的行为用'停止'。"
+                    ]
+                }
+            },
+            {
+                case: "（单选）小王的汽车被邻居小李的电动车堵在自家车库里，无法将车开出来。",
+                correctAnswer: "排除妨碍",
+                options: [
+                    { text: "停止侵害", description: "立即制止正在进行的侵权行为" },
+                    { text: "排除妨碍", description: "清除阻碍权利正常行使的物理障碍" },
+                    { text: "返还财产", description: "要求返还被不当占有的财产" }
+                ],
+                explanation: {
+                    title: "✅ 答案解析：排除妨碍",
+                    content: [
+                        "小李的电动车阻碍了小王正常使用汽车的权利。",
+                        "排除妨碍用于清除阻碍权利正常行使的物理障碍。",
+                        "记忆技巧：有障碍阻挡用'排除'。"
+                    ]
+                }
+            },
+            {
+                case: "（单选）广告牌摇摇欲坠，存在安全隐患。监管部门要求商家消除安全隐患。",
+                correctAnswer: "消除危险",
+                options: [
+                    { text: "消除危险", description: "消除可能造成损害的危险状态" },
+                    { text: "停止侵害", description: "立即制止正在进行的侵权行为" },
+                    { text: "排除妨碍", description: "清除阻碍权利行使的障碍" }
+                ],
+                explanation: {
+                    title: "✅ 答案解析：消除危险",
+                    content: [
+                        "广告牌存在造成他人损害的潜在危险。",
+                        "消除危险用于消除可能造成损害的危险状态，属于预防性措施。",
+                        "记忆技巧：有潜在危险用'消除'。"
+                    ]
+                }
+            },
+            {
+                case: "（单选）小赵借了同学小钱的高中数学教材，至今未还，小钱要求返还。",
+                correctAnswer: "返还财产",
+                options: [
+                    { text: "返还财产", description: "要求返还被他人不当占有的财产" },
+                    { text: "赔偿损失", description: "赔偿因侵权造成的经济损失" },
+                    { text: "恢复原状", description: "将财产恢复到损害发生前的状态" }
+                ],
+                explanation: {
+                    title: "✅ 答案解析：返还财产",
+                    content: [
+                        "小赵不当占有他人的教材拒不返还。",
+                        "返还财产用于要求返还被他人不当占有的财产。",
+                        "记忆技巧：借东西不还用'返还'。"
+                    ]
+                }
+            },
+            {
+                case: "（单选）小陈不小心摔坏了同学的平板电脑，屏幕碎裂，修理店可以维修。",
+                correctAnswer: "恢复原状",
+                options: [
+                    { text: "恢复原状", description: "将财产恢复到损害发生前的状态" },
+                    { text: "赔偿损失", description: "赔偿因侵权造成的经济损失" },
+                    { text: "返回财产", description: "要求返还被不当占有的财产" }
+                ],
+                explanation: {
+                    title: "✅ 答案解析：恢复原状",
+                    content: [
+                        "平板电脑被摔坏但可以修复还原。",
+                        "恢复原状用于将财产恢复到损害发生前的状态。",
+                        "记忆技巧：东西坏了能修用'恢复原状'。"
+                    ]
+                }
+            },
+            {
+                case: "（单选）小周骑车撞伤小刘，造成小刘医疗费、误工费等经济损失，小刘要求赔偿。",
+                correctAnswer: "赔偿损失",
+                options: [
+                    { text: "赔偿损失", description: "赔偿因侵权造成的经济损失" },
+                    { text: "恢复原状", description: "将财产恢复到损害发生前的状态" },
+                    { text: "赔礼道歉", description: "向权利人表示歉意" }
+                ],
+                explanation: {
+                    title: "✅ 答案解析：赔偿损失",
+                    content: [
+                        "撞伤造成实际的经济损失，包括医疗费和误工费等。",
+                        "赔偿损失用于补偿因侵权造成的经济损失。",
+                        "记忆技巧：造成经济损失用'赔偿损失'。"
+                    ]
+                }
+            },
+            {
+                case: "（多选）小郑恶意中伤小马，造成小马名誉严重受损，社会评价大幅下降。",
+                correctAnswer: ["赔礼道歉", "消除影响", "恢复名誉"],
+                isMultipleChoice: true,
+                options: [
+                    { text: "赔礼道歉", description: "向权利人表示歉意" },
+                    { text: "消除影响", description: "消除因侵权造成的不良社会影响" },
+                    { text: "恢复名誉", description: "恢复被损害的名誉权" }
+                ],
+                explanation: {
+                    title: "✅ 答案解析：赔礼道歉、消除影响、恢复名誉",
+                    content: [
+                        "小郑恶意中伤造成小马名誉严重受损，侵犯了人格权。",
+                        "赔礼道歉：用于侵犯人格权、名誉权时表示歉意。",
+                        "消除影响：用于消除侵权行为造成的不良社会影响。",
+                        "恢复名誉：用于恢复被损害的名誉权，重塑良好社会形象。",
+                        "记忆技巧：侵犯人格权时，这三种方式可能同时适用。"
+                    ]
+                }
+            }
+        ];
+
+        // 语音朗读功能 - 自动朗读题目
+        function speakText(text, rate = 0.85, pitch = 1) {
+            if (window.speechSynthesis && window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+            
+            if ('speechSynthesis' in window) {
+                speechInstance = new SpeechSynthesisUtterance(text);
+                speechInstance.lang = 'zh-CN';
+                speechInstance.rate = rate;
+                speechInstance.pitch = pitch;
+                speechInstance.volume = 1;
+                
+                window.speechSynthesis.speak(speechInstance);
+            }
+        }
+
+        function startGame() {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('questionScreen').style.display = 'block';
+            
+            currentQuestion = 0;
+            gameEnded = false;
+            selectedMultipleChoices = [];
+            
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            
+            // 只显示案例描述，不显示其他标题
+            document.getElementById('caseDescription').textContent = question.case;
+            
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                
+                if (question.isMultipleChoice) {
+                    optionDiv.onclick = () => toggleMultipleChoiceAnswer(option.text, optionDiv);
+                } else {
+                    optionDiv.onclick = () => selectSingleAnswer(option.text, optionDiv);
+                }
+                
+                optionDiv.innerHTML = `
+                    <div style="font-size: 24px; font-weight: bold; color: #4facfe;">${option.text}</div>
+                    <div class="option-description">${option.description}</div>
+                `;
+                
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            // 隐藏解释区域
+            const explanation = document.getElementById('explanation');
+            explanation.style.display = 'none';
+            explanation.innerHTML = ''; // 清空内容
+            
+            // 更新翻页控制
+            updatePageControls();
+            
+            // 自动朗读题目
+            setTimeout(() => {
+                let textToRead = question.case.replace(/（单选）|（多选）/g, '');
+                speakText(textToRead);
+            }, 300);
+            
+            // 滚动到顶部
+            document.querySelector('.container').scrollTop = 0;
+        }
+
+        function selectSingleAnswer(answer, element) {
+            if (gameEnded) return;
+            
+            const question = questions[currentQuestion];
+            const options = document.querySelectorAll('.option');
+            
+            options.forEach(option => option.style.pointerEvents = 'none');
+            
+            if (answer === question.correctAnswer) {
+                element.classList.add('correct');
+                setTimeout(() => {
+                    speakText("回答正确！");
+                }, 500);
+            } else {
+                element.classList.add('incorrect');
+                setTimeout(() => {
+                    speakText("回答错误，正确答案是：" + question.correctAnswer);
+                }, 500);
+                
+                options.forEach(option => {
+                    if (option.querySelector('div').textContent === question.correctAnswer) {
+                        option.classList.add('correct');
+                    }
+                });
+            }
+            
+            // 显示解释
+            const explanation = document.getElementById('explanation');
+            explanation.innerHTML = `
+                <h4>${question.explanation.title}</h4>
+                ${question.explanation.content.map(text => `<p>${text}</p>`).join('')}
+            `;
+            explanation.style.display = 'block';
+            
+            // 滚动到解释区域
+            setTimeout(() => {
+                explanation.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        function toggleMultipleChoiceAnswer(answer, element) {
+            if (gameEnded) return;
+            
+            const question = questions[currentQuestion];
+            
+            if (element.classList.contains('selected')) {
+                element.classList.remove('selected');
+                element.style.background = '#f5f5f5';
+                element.style.borderColor = '#e0e0e0';
+                selectedMultipleChoices = selectedMultipleChoices.filter(item => item !== answer);
+            } else {
+                element.classList.add('selected');
+                element.style.background = '#e3f2fd';
+                element.style.borderColor = '#4facfe';
+                selectedMultipleChoices.push(answer);
+            }
+        }
+
+        function updatePageControls() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const pageIndicator = document.getElementById('pageIndicator');
+            
+            // 更新页码指示
+            pageIndicator.textContent = `${currentQuestion + 1} / ${questions.length}`;
+            
+            // 更新按钮状态
+            prevBtn.disabled = currentQuestion === 0;
+            nextBtn.textContent = currentQuestion === questions.length - 1 ? "完成游戏" : "下一题 ➡️";
+            
+            // 设置按钮点击事件
+            prevBtn.onclick = prevQuestion;
+            nextBtn.onclick = currentQuestion === questions.length - 1 ? endGame : nextQuestion;
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                // 停止当前朗读
+                if (window.speechSynthesis && window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                }
+                
+                currentQuestion--;
+                selectedMultipleChoices = [];
+                showQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            // 停止当前朗读
+            if (window.speechSynthesis && window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+            
+            selectedMultipleChoices = [];
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            }
+        }
+
+        function endGame() {
+            gameEnded = true;
+            
+            // 朗读结束语
+            speakText("恭喜您完成了所有题目！游戏结束！");
+            
+            setTimeout(() => {
+                alert('🎉 游戏结束！\n\n恭喜您完成了所有题目！');
+                
+                // 返回欢迎界面
+                document.getElementById('questionScreen').style.display = 'none';
+                document.getElementById('welcomeScreen').style.display = 'block';
+            }, 1000);
+        }
+
+        // 页面加载完成时显示全屏提示
+        window.onload = function() {
+            console.log('🏥 侵权责任PPT互动游戏已启动 - 简化翻页版');
+            
+            // 如果浏览器支持全屏API，提示按F11进入全屏
+            if (document.documentElement.requestFullscreen) {
+                console.log('提示：按 F11 键可以进入全屏演示模式');
+            }
+        };
+    </script>
+</body>
+</html>
